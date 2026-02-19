@@ -1,0 +1,234 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Ultimate Logo Quiz with Skip</title>
+    <style>
+        body {
+            background-color: #111;
+            color: #fff;
+            font-family: 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+            margin: 0;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            min-height: 100vh;
+        }
+
+        #game-card {
+            background-color: #222;
+            padding: 30px;
+            border-radius: 20px;
+            box-shadow: 0 10px 40px rgba(0,0,0,0.8);
+            text-align: center;
+            width: 90%;
+            max-width: 450px;
+            border: 1px solid #333;
+        }
+
+        .logo-container {
+            background-color: #333;
+            width: 180px;
+            height: 180px;
+            margin: 0 auto 25px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 15px;
+            overflow: hidden;
+            padding: 10px;
+        }
+
+        #logo-image {
+            max-width: 150px;
+            max-height: 150px;
+            object-fit: contain;
+            transition: transform 0.3s ease;
+        }
+
+        h1 {
+            font-size: 1.8rem;
+            margin-bottom: 5px;
+            color: #4CAF50;
+        }
+
+        .stats {
+            margin-bottom: 20px;
+            font-size: 1.1rem;
+            color: #bbb;
+        }
+
+        #score {
+            color: #4CAF50;
+            font-weight: bold;
+        }
+
+        input[type="text"] {
+            width: 80%;
+            padding: 12px 15px;
+            border-radius: 8px;
+            border: 2px solid #444;
+            background: #1a1a1a;
+            color: white;
+            font-size: 1.1rem;
+            margin-bottom: 15px;
+            outline: none;
+            transition: border-color 0.3s;
+        }
+
+        input[type="text"]:focus {
+            border-color: #4CAF50;
+        }
+
+        button {
+            background-color: #4CAF50;
+            color: white;
+            border: none;
+            padding: 12px 20px;
+            font-size: 1.1rem;
+            font-weight: bold;
+            border-radius: 8px;
+            cursor: pointer;
+            margin: 5px;
+            transition: background 0.2s, transform 0.1s;
+        }
+
+        button:hover {
+            background-color: #45a049;
+        }
+
+        button:active {
+            transform: scale(0.98);
+        }
+
+        #progress-bar {
+            margin-top: 15px;
+            font-size: 0.9rem;
+            color: #666;
+        }
+    </style>
+</head>
+<body>
+
+<div id="game-card">
+    <h1>Logo Quiz</h1>
+    <div class="stats">Score: <span id="score">0</span></div>
+    
+    <div class="logo-container">
+        <img id="logo-image" src="" alt="Brand Logo">
+    </div>
+
+    <input type="text" id="answer-input" placeholder="Who am I?" autocomplete="off">
+    <br>
+    <button id="submit-btn">Submit</button>
+    <button id="skip-btn">Skip</button>
+
+    <div id="progress-bar">Logo <span id="current-num">1</span> of 30</div>
+</div>
+
+<script>
+    const brandData = [
+        { name: "Apple", url: "https://cdn-icons-png.flaticon.com/512/0/747.png" },
+        { name: "Google", url: "https://cdn-icons-png.flaticon.com/512/2991/2991148.png" },
+        { name: "Facebook", url: "https://cdn-icons-png.flaticon.com/512/5968/5968764.png" },
+        { name: "Instagram", url: "https://cdn-icons-png.flaticon.com/512/174/174855.png" },
+        { name: "Twitter", url: "https://cdn-icons-png.flaticon.com/512/3256/3256013.png" },
+        { name: "WhatsApp", url: "https://cdn-icons-png.flaticon.com/512/733/733585.png" },
+        { name: "YouTube", url: "https://cdn-icons-png.flaticon.com/512/1384/1384060.png" },
+        { name: "Amazon", url: "https://cdn-icons-png.flaticon.com/512/5968/5968202.png" },
+        { name: "Flipkart", url: "https://upload.wikimedia.org/wikipedia/commons/1/1e/Flipkart_logo.png" },
+       
+        { name: "Gmail", url: "https://cdn-icons-png.flaticon.com/512/732/732200.png" },
+        { name: "Messenger", url: "https://cdn-icons-png.flaticon.com/512/5968/5968771.png" },
+        { name: "Spotify", url: "https://cdn-icons-png.flaticon.com/512/174/174872.png" },
+        { name: "LinkedIn", url: "https://cdn-icons-png.flaticon.com/512/174/174857.png" },
+        { name: "Pinterest", url: "https://cdn-icons-png.flaticon.com/512/145/145808.png" },
+        { name: "Airbnb", url: "https://cdn-icons-png.flaticon.com/512/2111/2111320.png" },
+        { name: "Uber", url: "https://cdn-icons-png.flaticon.com/512/5969/5969178.png" },
+        { name: "Ola", url: "https://cdn-icons-png.flaticon.com/512/5969/5969213.png" },
+        { name: "Canva", url: "https://cdn-icons-png.flaticon.com/512/5968/5968534.png" },
+        { name: "GitHub", url: "https://cdn-icons-png.flaticon.com/512/25/25231.png" },
+        { name: "Microsoft", url: "https://cdn-icons-png.flaticon.com/512/732/732221.png" },
+        { name: "Android", url: "https://cdn-icons-png.flaticon.com/512/226/226770.png" },
+        { name: "Chrome", url: "https://cdn-icons-png.flaticon.com/512/888/888846.png" },
+        { name: "Telegram", url: "https://cdn-icons-png.flaticon.com/512/2111/2111646.png" },
+        { name: "TikTok", url: "https://cdn-icons-png.flaticon.com/512/3046/3046121.png" },
+        { name: "Snapchat", url: "https://cdn-icons-png.flaticon.com/512/174/174870.png" },
+        { name: "Apple Music", url: "https://cdn-icons-png.flaticon.com/512/10542/10542491.png" },
+        { name: "Twitch", url: "https://cdn-icons-png.flaticon.com/512/5968/5968819.png" },
+        { name: "PayPal", url: "https://cdn-icons-png.flaticon.com/512/174/174861.png" },
+        { name: "Zoom", url: "https://cdn-icons-png.flaticon.com/512/4401/4401475.png" }
+    ];
+
+    let gameQueue = [];
+    let currentIndex = 0;
+    let score = 0;
+
+    const logoImg = document.getElementById('logo-image');
+    const inputField = document.getElementById('answer-input');
+    const submitBtn = document.getElementById('submit-btn');
+    const skipBtn = document.getElementById('skip-btn');
+    const scoreDisplay = document.getElementById('score');
+    const currentNumDisplay = document.getElementById('current-num');
+
+    function shuffleDeck(array) {
+        for (let i = array.length - 1; i > 0; i--) {
+            const j = Math.floor(Math.random() * (i + 1));
+            [array[i], array[j]] = [array[j], array[i]];
+        }
+        return array;
+    }
+
+    function initGame() {
+        gameQueue = shuffleDeck([...brandData]);
+        currentIndex = 0;
+        score = 0;
+        scoreDisplay.textContent = score;
+        loadNextLogo();
+    }
+
+    function loadNextLogo() {
+        if (currentIndex < gameQueue.length) {
+            logoImg.src = gameQueue[currentIndex].url;
+            currentNumDisplay.textContent = currentIndex + 1;
+            inputField.value = "";
+            inputField.focus();
+        } else {
+            alert(`🎉 Game Over! Final Score: ${score}/30. Restarting...`);
+            initGame();
+        }
+    }
+
+    function handleGuess() {
+        const userGuess = inputField.value.trim().toLowerCase();
+        const correctAnswer = gameQueue[currentIndex].name.toLowerCase();
+
+        if (userGuess === correctAnswer) {
+            alert("✅ Correct!");
+            score++;
+            scoreDisplay.textContent = score;
+        } else {
+            alert(`❌ Wrong! Correct: ${gameQueue[currentIndex].name}`);
+        }
+
+        currentIndex++;
+        loadNextLogo();
+    }
+
+    function handleSkip() {
+        currentIndex++;
+        loadNextLogo();
+    }
+
+    submitBtn.addEventListener('click', handleGuess);
+    skipBtn.addEventListener('click', handleSkip);
+    inputField.addEventListener('keypress', (e) => {
+        if (e.key === 'Enter') handleGuess();
+    });
+
+    initGame();
+</script>
+</body>
+</html>
